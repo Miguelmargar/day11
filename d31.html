@@ -13,33 +13,45 @@
     <h1>D3 with SVG</h1>
     <div id="svg-goes-here"></div>
     <script>
+// define paramenters and set the array with values - have to have these first before anything ------------------------
         let h = 500;
-        let w = 500;
-        let barPadding = 1;
+        let w = 700;
+        let barPadding = 2;
         
-        let dataSet = [400, 450, 260, 320, 110, 90, 120, 150, 210, 170, 230, 260, 300, 320, 340, 410, 220, 220, 310, 400];
-    //creates a variable and link it to the array and id------    
+        let dataSet = [400, 450, 260, 320, 110, 90, 120, 150, 210, 170, 230, 260, 300, 320, 340, 410, 230, 220, 310, 400];
+   
+//this is done to scale the bars within the space of the graph and was done after the graph was created  5th step ------ 
+        let scale = d3.scale.linear()
+        .domain([0, 450]) // highest value in the data set
+        .range([0, 500]) // the heigth of the graph as the variable above
+        
+// this is done to save time in the code below was done after the graph was created and before the graph was scaled with the above - 4th step ----------------------
+        let colWidth = w / dataSet.length;
+        let barWidth = colWidth - barPadding;
+        
+//creates a variable and link it to the array and id - 1st step   
     let mySVG = d3.select("#svg-goes-here")
         .append("svg")
         .attr("height", h)
         .attr("width", w)
         
-    //creates the loop to be used---------------------    
+//creates the loop to be used - 2nd step  ------------  
     mySVG.selectAll("rect")
         .data(dataSet)
         .enter()
         .append("rect")
         .attr("x", function(d, i) {
-            return i * (w / dataSet.length);
+            return i * colWidth;
         })
         .attr("y", function (d) {
-            return h - d;
+            return h - scale(d);
         })
         .attr("height", function(d) {
-            return d;
+            return scale(d);
         })
-        .attr("width", w / dataSet.length - barPadding);
-        // adds text to the graph--------------------------------
+        .attr("width", barWidth);
+        
+// adds text to the graph - 3rd step - full graph creted ----
         mySVG.selectAll("text")
         .data(dataSet)
         .enter()
@@ -52,10 +64,10 @@
             return d;
         })
         .attr("x", function(d, i) {
-            return i * (w / dataSet.length)
+            return i * colWidth + barWidth / 2;
             })
         .attr("y", function(d) {
-            return h - d + 14;
+            return h - scale(d) + 14;
         })
     </script>
 

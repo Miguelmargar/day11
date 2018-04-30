@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <!-- linked to d3, crossfilter, dc.css and dc.js as per above-->
+    <div id="spend-chart"></div>
+    <script>
+        let transactionsData = [
+            { "name": "Tom", "store": "ACME", "state": "NY", "spend": 100 },
+            { "name": "Tom", "store": "Big Co", "state": "NY", "spend": 200 },
+            { "name": "Bob", "store": "ACME", "state": "FL", "spend": 150 },
+            { "name": "Bob", "store": "ACME", "state": "NY", "spend": 200 },
+            { "name": "Bob", "store": "Big Co", "state": "FL", "spend": 75 },
+            { "name": "Bob", "store": "Big Co", "state": "NY", "spend": 50 },
+            { "name": "Alice", "store": "ACME", "state": "FL", "spend": 200 },
+            { "name": "Alice", "store": "Big Co", "state": "NY", "spend": 350 },
+        ];
+// crossfilter is a library to manipulate lines of data sets
+        let ndx = crossfilter(transactionsData);
+// dimension is the x axis
+        let nameDim = ndx.dimension(dc.pluck('name'))
+
+// we are grouping dimension(name which is the x-axis) with
+// nameDim.group then
+// .reduceSum reduces the fields we need and sums up the values
+//per name as given by nameDim - the values to be summed up are
+//determined by dc.pluck('spend')
+        let totalSpend = nameDim.group().reduceSum(dc.pluck('spend'));
+        let spendChart = dc.barChart("#spend-chart");
+        
+        spendChart
+            .width(300)
+            .height(150)
+            .dimension(nameDim)
+            .group(totalSpend)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("Person")
+            .yAxis().ticks(4);
+            
+        dc.renderAll();
+        
+        
+    </script>
+</body>
+</html>
