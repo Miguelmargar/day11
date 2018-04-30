@@ -13,6 +13,8 @@
 <body>
     <!-- linked to d3, crossfilter, dc.css and dc.js as per above-->
     <div id="spend-chart"></div>
+    <div id="store-chart"></div>
+    <div id="state-chart"></div>
     <script>
         let transactionsData = [
             { "name": "Tom", "store": "ACME", "state": "NY", "spend": 100 },
@@ -27,14 +29,14 @@
 // crossfilter is a library to manipulate lines of data sets
         let ndx = crossfilter(transactionsData);
 // dimension is the x axis
-        let nameDim = ndx.dimension(dc.pluck('name'))
+        let nameDim = ndx.dimension(dc.pluck("name"));
 
 // we are grouping dimension(name which is the x-axis) with
 // nameDim.group then
 // .reduceSum reduces the fields we need and sums up the values
 //per name as given by nameDim - the values to be summed up are
 //determined by dc.pluck('spend')
-        let totalSpend = nameDim.group().reduceSum(dc.pluck('spend'));
+        let totalSpend = nameDim.group().reduceSum(dc.pluck("spend"));
         let spendChart = dc.barChart("#spend-chart");
         
         spendChart
@@ -46,6 +48,37 @@
             .xUnits(dc.units.ordinal)
             .xAxisLabel("Person")
             .yAxis().ticks(4);
+            
+//this makes a 2nd chart based from the same array at top but with different groups of data eg instead of name, store           
+        let storeDim = ndx.dimension(dc.pluck("store"));
+        let totalSpendByStore = storeDim.group().reduceSum(dc.pluck("spend"));
+        let storeChart = dc.barChart("#store-chart");
+        
+        storeChart
+            .width(300)
+            .height(150)
+            .dimension(storeDim)
+            .group(totalSpendByStore)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("Name of Store")
+            .yAxis().ticks(4);
+            
+ // filter spend by state ------------------           
+        let stateDim = ndx.dimension(dc.pluck("state"));
+        let totalSpendByState = stateDim.group().reduceSum(dc.pluck("spend"));
+        let stateChart = dc.barChart("#state-chart");
+        
+        stateChart
+            .width(300)
+            .height(150)
+            .dimension(stateDim)
+            .group(totalSpendByState)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("State")
+            .yAxis().ticks(6);
+            
             
         dc.renderAll();
         
