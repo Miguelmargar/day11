@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>D3 with SVG</h1>
+    <div id="svg-goes-here"></div>
+    <script>
+        let h = 500;
+        let w = 500;
+        let barPadding = 1;
+        
+        let dataSet = [400, 450, 260, 320, 110, 90, 120, 150, 210, 170, 230, 260, 300, 320, 340, 410, 220, 220, 310, 400];
+    //creates a variable and link it to the array and id------    
+    let mySVG = d3.select("#svg-goes-here")
+        .append("svg")
+        .attr("height", h)
+        .attr("width", w)
+        
+    //creates the loop to be used---------------------    
+    mySVG.selectAll("rect")
+        .data(dataSet)
+        .enter()
+        .append("rect")
+        .attr("x", function(d, i) {
+            return i * (w / dataSet.length);
+        })
+        .attr("y", function (d) {
+            return h - d;
+        })
+        .attr("height", function(d) {
+            return d;
+        })
+        .attr("width", w / dataSet.length - barPadding);
+        // adds text to the graph--------------------------------
+        mySVG.selectAll("text")
+        .data(dataSet)
+        .enter()
+        .append("text")
+        .attr("font-family", "sans-serif")
+        .attr("font-size", "11px")
+        .attr("text-anchor", "middle")
+        .attr("fill", "white")
+        .text(function(d) {
+            return d;
+        })
+        .attr("x", function(d, i) {
+            return i * (w / dataSet.length)
+            })
+        .attr("y", function(d) {
+            return h - d + 14;
+        })
+    </script>
+
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+    <title>Document</title>
+</head>
+
+<body>
+    <h1>D3 with SVG</h1>
+    <div id="svg-goes-here"></div>
+    <script>
+        let data = [40, 50, 25, 30, 25];
+        let colours = ["red", "blue", "orange", "yellow", "green"]
+        let w = data.length * 120;
+        let h = 300;
+
+        let mySVG = d3.select("#svg-goes-here")
+            .append("svg")
+            .attr("width", w)
+            .attr("height", h);
+            
+        mySVG.selectAll("circle")
+        .data(data)
+        .enter()
+        .append("circle")
+        .attr("fill", function(d, i) {
+            return colours[i];
+        })
+        .attr("cx", function(d, i) {
+            return 50 + (i * 100);
+        })
+        .attr("cy", function(d, i) {
+            return 60 + (i * -8);
+        })  
+        .attr("r", function(d) {
+            return d;
+        })
+    </script>
+
+</body>
+
+</html>
