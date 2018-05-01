@@ -26,7 +26,7 @@
             { "name": "Alice", "store": "ACME", "state": "FL", "spend": 200 },
             { "name": "Alice", "store": "Big Co", "state": "NY", "spend": 350 },
         ];
-// crossfilter is a library to manipulate lines of data sets
+// crossfilter is a library to manipulate lines of data sets - this links it to crossfilter
         let ndx = crossfilter(transactionsData);
 // dimension is the x axis
         let nameDim = ndx.dimension(dc.pluck("name"));

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.12/crossfilter.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dc/2.1.8/dc.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/queue-async/1.0.7/queue.js"></script>
+    <title>Document</title>
+</head>
+<body>
+    <a href="javascript:dc.filterAll(); dc.renderAll()">Reset All</a>
+    <!-- linked to d3, crossfilter, dc.css, dc.js and queue as per above-->
+    <!-- see file dc1 to see explanation from line 28 down-->
+    <div id="spend-chart"></div>
+    <div id="store-chart"></div>
+    <div id="state-chart"></div>
+    <div id="date-chart"></div>
+    <script>
+// the below uses queue library to order it to pick up the file in the data folder and go and make charts with it  but only after the file has been loaded.  
+        queue()
+            .defer(d3.json, "data/transactions.json")
+            .await(makeCharts);
+//the directly below: creates a function for the charts - (error) creates a depository for errors then otherwise the data is put into (transactionData)    
+        function makeCharts(error, transactionsData) {
+        let ndx = crossfilter(transactionsData);
+// dimension is the x axis
+        let nameDim = ndx.dimension(dc.pluck("name"));
+        
+// we are grouping dimension(name objects which is the x-axis created above)
+// with nameDim.group then
+// .reduceSum reduces the fields we need and sums up the values
+//each name as given by nameDim - the values to be summed up are
+//determined by dc.pluck('spend')
+        let totalSpend = nameDim.group().reduceSum(dc.pluck("spend"));
+        let spendChart = dc.barChart("#spend-chart");
+        
+        spendChart
+            .width(300)
+            .height(150)
+            .dimension(nameDim)
+            .group(totalSpend)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("Person")
+            .yAxis().ticks(4);
+            
+//this makes a 2nd chart based from the same array at top but with different groups of data eg instead of name, store           
+        let storeDim = ndx.dimension(dc.pluck("store"));
+        let totalSpendByStore = storeDim.group().reduceSum(dc.pluck("spend"));
+        let storeChart = dc.barChart("#store-chart");
+        
+        storeChart
+            .width(300)
+            .height(150)
+            .dimension(storeDim)
+            .group(totalSpendByStore)
+            .x(d3.scale.ordinal())
+            .xUnits(dc.units.ordinal)
+            .xAxisLabel("Name of Store")
+            .yAxis().ticks(4);
+            
+ // filter spend by state ------------------           
+        let stateDim = ndx.dimension(dc.pluck("state"));
+        let totalSpendByState = stateDim.group().reduceSum(dc.pluck("spend"));
+//the below line is not needed if we do the below as it is the same way but Matt thinks is better and more visible to have the line below and create the chart as the examples above   
+
+//         let stateChart = dc.barChart("#state-chart");
+            dc.pieChart("#state-chart")
+                .height(300)
+                .radius(100)
+                .dimension(stateDim)
+                .group(totalSpendByState)
+
+
+ //All the below creates a linechart graph            
+//parseDate tell the program that this is the date format needed to be used with the file        
+        let parseDate = d3.time.format("%d/%m/%Y").parse; 
+//the directly below links the file with here and creates a loop to run every string date given in file to a date format here to be picked up by the created chart.       
+        transactionsData.forEach(function(d) {
+            d.date = parseDate(d.date);
+        });
+        let dateDim = ndx.dimension(dc.pluck("date"));
+        let totalSpendByTime = dateDim.group().reduceSum(dc.pluck("spend"));
+//the two lines below tells to take the lowest and highest values if we wanted lowest 2 we would write .bottom(2). We need the lowest value for the linechart. these are to give the top and bottom values for the x-axis.      
+        let minDate = dateDim.bottom(1)[0].date;
+        let maxDate = dateDim.top(1)[0].date;
+        console.log(dateDim.bottom(1))
+        dc.lineChart("#date-chart")
+        .width(1000)
+        .height(300)
+        .dimension(dateDim)
+        .group(totalSpendByTime)
+        .x(d3.time.scale().domain([minDate, maxDate]))
+        .xAxisLabel("Month");
+        
+        dc.renderAll();
+        }
+        
+    </script>
+</body>
+</html>
