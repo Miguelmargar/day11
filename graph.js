@@ -47,7 +47,7 @@ function makeGraph(error, transactionsData) {
     let compositeChart = dc.compositeChart("#composite-chart")
         compositeChart
             .width(1000)
-            .height(400)
+            .height(350)
             .dimension(dateDim)
             .x(d3.time.scale().domain([minDate, maxDate]))
             .yAxisLabel("spend")
@@ -68,5 +68,44 @@ function makeGraph(error, transactionsData) {
                 .yAxis().ticks(12);
                 
                 dc.renderAll(); // this renders everything together
-        
+
+
+
+    let  storeASpend = dateDim.group().reduceSum(function(d) {
+        if (d.store === "A") {
+            return +d.spend;
+        } else{
+            return 0;
+        }
+    let storeBSpend = dateDim.group().reduceSum(function(d) {
+        if (d.store === "B") {
+            return +d.spend; 
+            } else {
+                return 0;
+            };
+        });
+    });
+    
+    let compositeChartState = dc.compositeChart("#composite-chart-by-store")
+        compositeChartState 
+        .width(1000)
+            .height(350)
+            .dimension(dateDim)
+            .x(d3.time.scale().domain([minDate, maxDate]))
+            .yAxisLabel("store")
+            .renderHorizontalGridLines(true)
+            .legend(dc.legend().x(80).y(20).itemHeight(13).gap(5))
+            .compose([
+                dc.lineChart(compositeChart)
+                .colors("green")
+                .group(tomSpend, "A"),
+                dc.lineChart(compositeChart)
+                .colors("red")
+                .group(bobSpend, "B"),
+                ])
+                .render()
+                .yAxis().ticks(12);
+                
+                dc.renderAll();
+            
 }
