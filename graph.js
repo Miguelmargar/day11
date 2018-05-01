@@ -47,7 +47,7 @@ function makeGraph(error, transactionsData) {
     let compositeChart = dc.compositeChart("#composite-chart")
         compositeChart
             .width(1000)
-            .height(350)
+            .height(200)
             .dimension(dateDim)
             .x(d3.time.scale().domain([minDate, maxDate]))
             .yAxisLabel("spend")
@@ -70,13 +70,14 @@ function makeGraph(error, transactionsData) {
                 dc.renderAll(); // this renders everything together
 
 
-
+// do not need the parseDate for the x-axis as it is already defined above within the initial function
     let  storeASpend = dateDim.group().reduceSum(function(d) {
         if (d.store === "A") {
             return +d.spend;
-        } else{
+        } else {
             return 0;
         }
+    })
     let storeBSpend = dateDim.group().reduceSum(function(d) {
         if (d.store === "B") {
             return +d.spend; 
@@ -84,12 +85,11 @@ function makeGraph(error, transactionsData) {
                 return 0;
             };
         });
-    });
     
-    let compositeChartState = dc.compositeChart("#composite-chart-by-store")
-        compositeChartState 
-        .width(1000)
-            .height(350)
+    let compositeChartStore = dc.compositeChart("#composite-chart-by-store")
+        compositeChartStore 
+            .width(1000)
+            .height(200)
             .dimension(dateDim)
             .x(d3.time.scale().domain([minDate, maxDate]))
             .yAxisLabel("store")
@@ -105,6 +105,74 @@ function makeGraph(error, transactionsData) {
                 ])
                 .render()
                 .yAxis().ticks(12);
+                
+                dc.renderAll();
+                
+        
+    let nySpend = dateDim.group().reduceSum(function(d) {
+        if (d.state === "NY") {
+            return +d.spend;
+        } else {
+            return 0
+        };
+    })
+    let flSpend = dateDim.group().reduceSum(function(d) {
+         if (d.state === "FL") {
+            return +d.spend;
+        } else {
+            return 0
+        };
+    })
+    let caSpend = dateDim.group().reduceSum(function(d) {
+         if (d.state === "CA") {
+            return +d.spend;
+        } else {
+            return 0
+        };
+    })
+    let tnSpend = dateDim.group().reduceSum(function(d) {
+         if (d.state === "TN") {
+            return +d.spend;
+        } else {
+            return 0
+        };
+    })
+    let wiSpend = dateDim.group().reduceSum(function(d) {
+         if (d.state === "WI") {
+            return +d.spend;
+        } else {
+            return 0
+        };
+    });
+                
+    let compositeChartState = dc.compositeChart("#composite-chart-by-state")            
+        compositeChartState
+            .width(1000)
+            .height(200)
+            .dimension(dateDim)
+            .x(d3.time.scale().domain([minDate, maxDate]))
+            .yAxisLabel("store")
+            .renderHorizontalGridLines(true)
+            .legend(dc.legend().x(80).y(20).itemHeight(13).gap(5))
+            .compose([
+                dc.lineChart(compositeChart)
+                .colors("red")
+                .group(nySpend, "NY"),
+                dc.lineChart(compositeChart)
+                .colors("blue")
+                .group(flSpend, "FL"),
+                dc.lineChart(compositeChart)
+                .colors("yellow")
+                .group(caSpend, "CA"),
+                dc.lineChart(compositeChart)
+                .colors("black")
+                .group(tnSpend, "TN"),
+                dc.lineChart(compositeChart)
+                .colors("orange")
+                .group(wiSpend, "WI"),
+                ])
+                .render()
+                .yAxis().ticks(8);
                 
                 dc.renderAll();
             
