@@ -1,0 +1,44 @@
+below is for creting averages - 3 functions needed 1st function adds 2nd function removes 3rd function initialises the entire thing.  
+need to add lines to the bar chart too as well - please note that a reduce function is used rather than the reduceSum function.
+
+the order of these three functions is important that stays like the below.
+
+         var group = dim.group().reduce(                           -this function gets called when information is removed from the information list
+                function reduceAdd(p, v) {                          -p is the object return by init while v is the copy of the current record
+                    p.count++;                                  
+                    p.total += v.spend;                            -this is p.total plus the added count
+                    p.average = p.total / p.count;                  -this line creates the average 
+                    return p;
+                },
+                function reduceRmove(p, v) {                        -this function gets called whenever we remove information from the list
+                    p.count--;
+                    if (p.count == 0) {                             -this if line ensures that when things are removed and count reaches 0 count or initial is given to 0
+                        p.total = 0;
+                        p.average = 0;
+                    }
+                    else {
+                        p.total -= v.spend;
+                        p.average = p.total / p.count;
+                    }
+                    return p;                                        - make sure to include the return of p at the end of the add and remove functions
+                },
+                function reduceInit() {
+                    return { count: 0, total: 0, average: 0 };
+                }
+            );
+    
+ 
+once we have created the above custom reduce functions we need to use the value accessor function to get a value from the custom reduce functions as per the below:
+
+.valueAccessor(function(p) {
+    return p.value.average;
+    })
+    
+the value accessor function is used in the graph creation lines.
+
+this average functions will automatically adapt with changes on the file used. 
+    
+you can use reduceCount to get a count of the information - ie the number of males or females in the array.
+    
+can use the reduce function to obtain custom information such as % of salaries - eg. 75% of salary would be done in line 9 by multiplying by 0.75.
+
